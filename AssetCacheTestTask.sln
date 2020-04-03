@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetCacheImplementation", "AssetCacheImplementation\AssetCacheImplementation.csproj", "{A635E8C5-6D2C-4112-BCB1-0CA2ED4C6085}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetCacheTests", "AssetCacheTests\AssetCacheTests.csproj", "{9F493473-5C92-4D89-979A-A71DA2AB6CE7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A635E8C5-6D2C-4112-BCB1-0CA2ED4C6085}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A635E8C5-6D2C-4112-BCB1-0CA2ED4C6085}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A635E8C5-6D2C-4112-BCB1-0CA2ED4C6085}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A635E8C5-6D2C-4112-BCB1-0CA2ED4C6085}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F493473-5C92-4D89-979A-A71DA2AB6CE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F493473-5C92-4D89-979A-A71DA2AB6CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F493473-5C92-4D89-979A-A71DA2AB6CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F493473-5C92-4D89-979A-A71DA2AB6CE7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {309C7054-83CB-4740-930E-FD7BBE24D598}
+	EndGlobalSection
+EndGlobal
