@@ -24,7 +24,7 @@ namespace AssetCacheTests
             cache.Merge(path, test);
 
             caches.Add("SampleScene.unity", cache);
-            
+
             cache = new AssetCache();
             path = PathToFile("SimpleScene.unity");
             test = cache.Build(path, () => { });
@@ -50,15 +50,18 @@ namespace AssetCacheTests
         public void OperationCancelTest()
         {
             var cache = new AssetCache();
+            var path = PathToFile("SampleScene.unity");
             object test;
             try
             {
-                cache.Build(PathToFile("SampleScene.unity"), () => { throw new AssetCacheImplementation.OperationCanceledException(); });
+                cache.Build(path, () => { throw new AssetCacheImplementation.OperationCanceledException(); });
             }
             catch { }
-            test = cache.Build(PathToFile("SampleScene.unity"), () => {});
+            test = cache.Build(path, () => { });
 
-            Assert.IsTrue(((Cache)test).IsValid());
+            cache.Merge(path, test);
+
+            Assert.IsTrue(cache.IsBuiltAndReady);
         }
 
         [TestCase("SampleScene.unity")]
@@ -83,7 +86,7 @@ namespace AssetCacheTests
             Assert.AreEqual(cache.GetGuidUsages(guid), guidTrueCount);
         }
 
-        [TestCase("SimpleScene.unity", (ulong) 757051385, 0)]
+        [TestCase("SimpleScene.unity", (ulong)757051385, 0)]
         [TestCase("SampleScene.unity", (ulong)757051385, 1)]
         [TestCase("SampleScene.unity", (ulong)17640, 2)]
         [TestCase("SampleScene.unity", (ulong)1278330991, 3)]
@@ -110,7 +113,55 @@ namespace AssetCacheTests
             var cache = caches[fileName];
             Assert.AreEqual(cache.GetLocalAnchorUsages(anchor), trueCount);
         }
-    }
 
+        [Test]
+        public void GetAnchorUsagesExceptionTest()
+        {
+            var cache = new AssetCache();
+            var path = PathToFile("SimpleScene.unity");
+            ulong anchor = 1278330992;
+            object test = cache.Build(path, () => { });
+            //cache.Merge(path, test);
+            Assert.Catch(() => { cache.GetLocalAnchorUsages(anchor); });
+        }
+
+        [Test]
+        public void GetComponentsExceptionTest()
+        {
+            var cache = new AssetCache();
+            var path = PathToFile("SimpleScene.unity");
+            ulong anchor = 1278330992;
+            object test = cache.Build(path, () => { });
+            //cache.Merge(path, test);
+            Assert.Catch(() => { cache.GetComponentsFor(anchor); });
+        }
+
+        [Test]
+        public void GuidCountExceptionTest()
+        {
+            var cache = new AssetCache();
+            var path = PathToFile("SimpleScene.unity");
+            var anchor = "801a0a604e828724da83b96f51cee06d";
+            object test = cache.Build(path, () => { });
+            //cache.Merge(path, test);
+            Assert.Catch(() => { cache.GetGuidUsages(anchor); });
+        }
+
+        [Test]
+        public void DoubleMergeTest()
+        {
+            var cache = new AssetCache();
+            var path1 = PathToFile("SimpleScene.unity");
+            var path2 = PathToFile("SampleScene.unity");
+            object test1 = cache.Build(path1, () => { });
+            object test2 = cache.Build(path2, () => { });
+
+            cache.Merge(path1, test1);
+            cache.Merge(path2, test2);
+
+            Assert.IsTrue(cache.IsBuiltAndReady);
+
+        }
+    }
 
 }

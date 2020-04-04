@@ -13,7 +13,5 @@ namespace AssetCacheImplementation
 
     internal class CacheTypeMismatchException : System.Exception { };
 
-    internal class FileIdNotFoundException : System.Exception { };
-
     internal class CacheIsInvalidException : System.Exception { };
 }

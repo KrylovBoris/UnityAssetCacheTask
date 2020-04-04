@@ -2,14 +2,22 @@ using System.Collections.Generic;
 
 namespace AssetCacheImplementation
 {
-
-    public class Cache
+    /// <summary>
+    /// Класс — контейнер для 
+    /// </summary>
+    internal class Cache
     {
-
+        //Флаг того, что программа закончила построение контейнера
         private bool _isComplete;
-        
+
+        //Таблицы, куда вносятся все найденные объекты и ассеты
+        private readonly Dictionary<ulong, SceneEntity> _cachedObjects;
+        private readonly Dictionary<string, Asset> _cachedAssets;
+
+        //Путь до закэшированного файла
         public string PathToFile { get; }
         
+        //Поле, возвращающее список всех найденных fileID объектов сцены
         public List<ulong> FileIds
         {
             get
@@ -17,7 +25,7 @@ namespace AssetCacheImplementation
                 return new List<ulong>(_cachedObjects.Keys);
             }
         }
-
+        //Поле, возвращающее список всех найденных GUID
         public List<string> GuIds
         {
             get
@@ -26,31 +34,38 @@ namespace AssetCacheImplementation
             }
         }
 
-        private Dictionary<ulong, SceneEntity> _cachedObjects;
+        public Cache(string path)
+        {
+            PathToFile = path;
+            _cachedObjects = new Dictionary<ulong, SceneEntity>();
+            _cachedAssets = new Dictionary<string, Asset>();
+        }
 
-        private Dictionary<string, Asset> _cachedAssets;
+        #region Cache entities
 
+        // Класс, представляющий уникальный объект сцены
         private class SceneEntity
         {
-            private readonly ulong _fileId;
+            public ulong FileId { get; private set; }
+            public string EntityType { get; protected set; }
 
-            public ulong FileId => _fileId;
-
-            protected string type;
-            public string EntityType => type;
-
+            //Список идентификаторов, на которые ссылается данный объект
             protected List<ulong> refsToOtherEntities;
 
             public SceneEntity(ulong id)
             {
-                _fileId = id;
-                type = "Unspecified";
+                FileId = id;
+                EntityType = "Unspecified";
                 refsToOtherEntities = new List<ulong>();
             }
 
+            /// <summary>
+            /// Метод, уточняющий тип объекта сцены
+            /// </summary>
+            /// <param name="newType">Новый тип</param>
             public void SpecifyType(string newType)
             {
-                type = newType;
+                EntityType = newType;
             }
 
             public void AddLinkToOtherEntity(ulong fileId)
@@ -58,6 +73,11 @@ namespace AssetCacheImplementation
                 refsToOtherEntities.Add(fileId);
             }
 
+            /// <summary>
+            /// Подсчёт ссылок на заданный объект
+            /// </summary>
+            /// <param name="fileId">Идентификатор объекта, на который считаются ссылки</param>
+            /// <returns>Сколько раз данный объект ссылается на объект с идентификатором fileID</returns>
             public virtual int CountReferences(ulong fileId)
             {
                 int count = 0;
@@ -73,14 +93,16 @@ namespace AssetCacheImplementation
                 return refsToOtherEntities;
             }
         }
-
+        
+        // Класс, представляющий игровой объект
         private class GameObject : SceneEntity
         {
-            private List<ulong> _components;
+            //Список компонентов
+            private readonly List<ulong> _components;
 
             public GameObject(ulong id) : base(id)
             {
-                type = "GameObject";
+                EntityType = "GameObject";
                 _components = new List<ulong>();
             }
 
@@ -108,37 +130,34 @@ namespace AssetCacheImplementation
             }
         }
 
+        // Класс, представляющий ассет
         private class Asset
         {
-
-            private readonly string _guid;
-            private readonly ulong _typeFileId;
-            private List<ulong> _referencedBySceneEntities;
-            public string Guid => _guid;
-            public ulong TypeMarker => _typeFileId;
+            //список объектов, ссылающихся на данный ассет
+            private readonly List<ulong> _referencedBySceneEntities;
+            
+            public string Guid { get; private set; }
+            //FileID
+            public ulong AssetTypeId { get; private set; }
+            public int UsageCount => _referencedBySceneEntities.Count;
 
             public Asset(string guid, ulong parentFileId, ulong typeFileId)
             {
-                _guid = guid;
-                _typeFileId = typeFileId;
+                Guid = guid;
+                AssetTypeId = typeFileId;
                 _referencedBySceneEntities = new List<ulong>(){parentFileId};
             }
 
-            public void AddReference (ulong parentFileId)
+            public void AddReference(ulong parentFileId)
             {
                 _referencedBySceneEntities.Add(parentFileId);
             }
-            public int UsageCount => _referencedBySceneEntities.Count;
+            
         }
 
-        public Cache(string path)
-        {
-            PathToFile = path;
-            _cachedObjects = new Dictionary<ulong, SceneEntity>();
-            _cachedAssets = new Dictionary<string, Asset>();
-        }
+        #endregion
 
-        #region CacheBuildingMethods
+        #region Cache Building Methods
         public void ConstructSceneEntity(ulong fileId)
         {
             if (!_cachedObjects.ContainsKey(fileId))
@@ -216,8 +235,9 @@ namespace AssetCacheImplementation
 
         #endregion
 
-        #region CacheValidationMethods
+        #region Cache Validation Methods
 
+        //Эти методы необходимы для проверки того, что кэш составлен корректно
         public bool IsValid()
         {
             return DoAllGameObjectsHaveComponents() && _isComplete && AreAllTypesSpecified();
@@ -241,8 +261,11 @@ namespace AssetCacheImplementation
             }
             return result;
         }
+
         #endregion
 
+        #region Public Interface
+        //Интерфейс для взаимодействия с содержимым кэша
         public bool IsGameObject(ulong fileId)
         {
             return _cachedObjects[fileId] is GameObject;
@@ -260,7 +283,7 @@ namespace AssetCacheImplementation
 
         public ulong GetAssetFileId(string guid)
         {
-            return _cachedAssets[guid].TypeMarker;
+            return _cachedAssets[guid].AssetTypeId;
         }
 
         public IEnumerable<ulong> GetComponents(ulong fileId)
@@ -282,5 +305,7 @@ namespace AssetCacheImplementation
         {
             return _cachedObjects[referencesSource].GetAllReferences();
         }
+
+        #endregion
     }
 }
