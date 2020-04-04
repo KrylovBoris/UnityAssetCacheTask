@@ -107,7 +107,7 @@ namespace AssetCacheTests
         [TestCase("SimpleScene.unity", (ulong)705507994, 2)]
         [TestCase("SampleScene.unity", (ulong)705507994, 0)]
         [TestCase("SampleScene.unity", (ulong)1443645507, 6)]
-        [TestCase("SimpleScene.unity", (ulong)2100000, 3)]
+        [TestCase("SаmpleScene.unity", (ulong)2100000, 0)]
         public void GetAnchorCountTest(string fileName, ulong anchor, int trueCount)
         {
             var cache = caches[fileName];

@@ -263,7 +263,7 @@ namespace AssetCacheImplementation
                     }
                 }
             }
-
+            //Если такой FileID отсутсвовал на сцене, функция вернёт 0
             return usages;
         }
 
@@ -273,7 +273,7 @@ namespace AssetCacheImplementation
             {
                 throw new CacheIsInvalidException();
             }
-
+            //Если такой GUID отсутсвовал на сцене, функция вернёт 0
             return cache.GetGuidUsage(guid);
         }
 
@@ -288,6 +288,7 @@ namespace AssetCacheImplementation
             {
                 return cache.GetComponents(gameObjectAnchor);
             }
+            //Если gameObject с таким FileID отсутсвовал на сцене, функция вернёт пустую коллекцию
             return new ulong[0];
         } 
 
